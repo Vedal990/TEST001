@@ -1,0 +1,29 @@
+{
+  "name": "MedicationReminder",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "User ID who owns this reminder"
+    },
+    "remind_time": {
+      "type": "string",
+      "description": "Time in HH:MM:SS format, e.g. 10:25:00"
+    },
+    "memo": {
+      "type": "string",
+      "description": "Reminder memo/note"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the reminder is active"
+    }
+  },
+  "required": [
+    "user_id",
+    "remind_time",
+    "memo",
+    "is_active"
+  ]
+}
