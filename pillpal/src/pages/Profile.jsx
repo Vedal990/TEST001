@@ -1,7 +1,3 @@
-import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { LogOut, Globe } from "lucide-react";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -24,12 +20,7 @@ export default function Profile() {
 
   const toggleLang = (next) => {
     if (next === currentLang) return;
-    setLang(next); // no reload
-  };
-
-  const handleLogout = () => {
-    logout();
-    nav("/login", { replace: true });
+    setLang(next); // no reload -> avoids Vercel 404 on /profile refresh
   };
 
   const handleLogout = () => {
@@ -47,6 +38,7 @@ export default function Profile() {
           <div className="h-16 w-16 rounded-full bg-teal-100 flex items-center justify-center">
             <span className="text-2xl font-bold text-teal-700">{avatarLetter}</span>
           </div>
+
           <div className="flex-1 min-w-0">
             <p className="text-xl font-semibold text-foreground truncate">{phone || "—"}</p>
             <p className="text-base text-muted-foreground truncate">{t("phone_number")}</p>
@@ -61,7 +53,9 @@ export default function Profile() {
 
           <div className="flex justify-between items-center py-2">
             <span className="text-lg text-muted-foreground">{t("user_id")}</span>
-            <span className="text-sm font-mono text-muted-foreground truncate max-w-[180px]">{userId || "—"}</span>
+            <span className="text-sm font-mono text-muted-foreground truncate max-w-[180px]">
+              {userId || "—"}
+            </span>
           </div>
         </div>
       </div>
@@ -76,6 +70,7 @@ export default function Profile() {
 
           <div className="flex bg-muted rounded-xl overflow-hidden">
             <button
+              type="button"
               onClick={() => toggleLang("en")}
               className={cn(
                 "px-5 py-2.5 text-base font-medium transition-colors",
@@ -84,7 +79,9 @@ export default function Profile() {
             >
               EN
             </button>
+
             <button
+              type="button"
               onClick={() => toggleLang("zh")}
               className={cn(
                 "px-5 py-2.5 text-base font-medium transition-colors",
