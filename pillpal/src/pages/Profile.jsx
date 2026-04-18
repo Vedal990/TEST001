@@ -2,15 +2,20 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { LogOut, Globe } from "lucide-react";
-import { t, getLang, setLang } from "@/lib/i18n";
+import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { LogOut, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/AuthContext";
+import { useLang, useT } from "@/lib/LanguageContext";
 
 export default function Profile() {
   const nav = useNavigate();
   const { userId, phone, logout } = useAuth();
 
-  const [currentLang, setCurrentLang] = useState(getLang());
+  const { lang: currentLang, setLang } = useLang();
+  const t = useT();
 
   const avatarLetter = useMemo(() => {
     const s = (phone || "").trim();
@@ -19,10 +24,12 @@ export default function Profile() {
 
   const toggleLang = (next) => {
     if (next === currentLang) return;
-    setLang(next);
-    setCurrentLang(next);
-    // simplest reliable approach: refresh once so all components re-read t()
-    window.location.reload();
+    setLang(next); // no reload
+  };
+
+  const handleLogout = () => {
+    logout();
+    nav("/login", { replace: true });
   };
 
   const handleLogout = () => {
