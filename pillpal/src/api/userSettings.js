@@ -3,12 +3,28 @@ import { supabase, assertNoSupabaseError } from "@/api/supabaseClient";
 export const FONT_SCALE_NORMAL = 100;
 export const FONT_SCALE_LARGE = 140;
 
+/**
+ * Converts font scale percentage to px value.
+ * Adjusts for mobile screens to prevent text overflow in Elderly Mode.
+ * @param {number|string} scale 
+ * @returns {string}
+ */
 export const fontScaleToPx = (scale) => {
-  // Keep it simple: 100 -> 16px, 140 -> 22px
-  if (Number(scale) >= 140) return "22px";
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const numScale = Number(scale);
+
+  if (numScale >= 140) {
+    // Elderly Mode: Use 22px on Desktop, but 19px on Mobile for better fit
+    return isMobile ? "19px" : "22px";
+  }
+  
+  // Standard Mode: Default 16px
   return "16px";
 };
 
+/**
+ * Fetch settings for a specific user
+ */
 export async function getUserSettings(userId) {
   if (!userId) return null;
 
@@ -22,10 +38,12 @@ export async function getUserSettings(userId) {
   return res.data?.[0] || null;
 }
 
+/**
+ * Create or update user settings
+ */
 export async function upsertUserSettings(userId, defaults) {
   if (!userId) return null;
 
-  // Prefer merge duplicates so it behaves like upsert
   const res = await supabase
     .from("user_settings")
     .upsert(
@@ -42,6 +60,9 @@ export async function upsertUserSettings(userId, defaults) {
   return res.data;
 }
 
+/**
+ * Patch existing user settings
+ */
 export async function updateUserSettings(userId, patch) {
   if (!userId) return null;
 
