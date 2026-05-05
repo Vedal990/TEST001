@@ -1,40 +1,56 @@
 # PillPal
 
-PillPal is a lightweight demo app for **medication reminders**, **simple user login**, and **device binding**, built with **React + Vite** and **Supabase**.  
-It is designed as a small course project to demonstrate a complete flow: reminders → confirmation → event history, with optional device-side interaction (simulated).
+PillPal is a lightweight course/demo web app for **medication reminders** and **basic chronic-disease health management**, built with **React + Vite**. It uses **Supabase** as the backend (Postgres + JS client) and includes a simple **phone-number login** flow, reminder confirmation tracking, and optional **device binding** (simulated).
 
-## What the App Does
+## Features
 
-- **Login (demo)**: Identify a user by phone number (stored in the `users` table).
-- **Reminders**: Create, edit, and delete medication reminders (`medication_reminders`).
-- **Confirm actions**: Confirm a reminder in the app and store an event (`pill_event`, e.g. `confirmed_by_app`).
-- **Device binding**: Bind a `device_id` to the current user (`device_bindings`).
-- **History**: View event history (`pill_event`) with filtering by event type.
+- **Demo login** with a phone number (stored in a `users` table)
+- **Medication reminders**: create / edit / delete reminders
+- **Confirm reminders** and write events to an event table (e.g., `confirmed_by_app`)
+- **Device binding**: bind a `device_id` to the current user
+- **History**: view and filter pill events
+- **Chronic disease pages** (e.g., Diabetes, Heart Disease, Mood, Respiratory, General) with a **dynamic detail page** route (`/disease/:id`)
 
 ## Tech Stack
 
-- React + Vite
-- Supabase (Postgres + JavaScript client)
-- TailwindCSS + shadcn/ui
+- **React 18** + **Vite**
+- **React Router** (client-side routing)
+- **@tanstack/react-query** (data fetching/caching)
+- **Supabase** (`@supabase/supabase-js`)
+- **Tailwind CSS** + **shadcn/ui** (Radix UI primitives)
 
-## Project Structure
+## Project Layout
 
-This repository contains the app under:
+This repository contains the app inside:
 
-- `pillpal/` — Vite project root (this is where you run npm commands)
+- `pillpal/` — Vite project root (run all npm commands here)
+
+Key files/folders:
+
+- `pillpal/src/main.jsx` — app bootstrap (providers + render)
+- `pillpal/src/App.jsx` — router, auth guard, and main routes
+- `pillpal/src/pages/` — route pages
+- `pillpal/src/components/` — reusable components + UI
+- `pillpal/src/api/` — API/Supabase calls (if present)
+- `pillpal/src/lib/` — contexts, shared utilities, query client, etc.
+- `pillpal/src/hooks/` — custom React hooks
+- `pillpal/vite.config.js` — Vite config + `@` alias to `src`
+- `pillpal/vercel.json` — SPA rewrite rules for Vercel
 
 ## Getting Started (Local)
 
-### 1) Install dependencies
+### Prerequisites
+- Node.js 18+ recommended
 
+### Install
 ```bash
 cd pillpal
 npm install
 ```
 
-### 2) Configure environment variables
+### Environment Variables
 
-Copy the example file and fill in your Supabase credentials:
+Create a local env file (or adapt to your deployment platform):
 
 ```bash
 # from inside the pillpal folder
@@ -49,17 +65,26 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 VITE_DEFAULT_DEVICE_ID=demo_device_01
 ```
 
-### 3) Run the dev server
-
+### Run
 ```bash
 npm run dev
 ```
 
-Open the local URL shown in the terminal (typically `http://localhost:5173/`).
+Open the URL shown in the terminal (typically `http://localhost:5173/`).
 
-## Supabase Database Schema (Expected Tables)
+## Routes (High Level)
 
-This app expects the following tables in Supabase:
+- `/login` — login page
+- `/` — reminders
+- `/history` — event history
+- `/device` — device binding
+- `/profile` — profile/settings
+- `/diabetes`, `/heart`, `/mood`, `/respiratory`, `/general` — disease modules
+- `/disease/:id` — dynamic disease detail/config page
+
+## Expected Supabase Tables (Example)
+
+This app typically expects tables similar to:
 
 ### `users`
 - `id` (uuid, primary key, default `gen_random_uuid()`)
@@ -86,23 +111,24 @@ This app expects the following tables in Supabase:
 - `user_id` (uuid, foreign key → `users.id`)
 - `bound_at` (timestamp, default `now()`)
 
+> Note: If Row Level Security (RLS) is enabled, you must add policies accordingly (or disable RLS for a simpler demo setup).
+
 ## Scripts
 
 From `pillpal/`:
 
 - `npm run dev` — start development server
 - `npm run build` — build for production
-- `npm run preview` — preview production build locally
+- `npm run preview` — preview the production build locally
 - `npm run lint` — run ESLint
+- `npm run lint:fix` — fix lint issues
+- `npm run typecheck` — run TypeScript typecheck (via `jsconfig.json`)
 
-## Common Troubleshooting
+## Deployment Notes
 
-### `@/...` imports cannot be resolved
-This project uses an `@` path alias to `src`. Make sure you run the dev server from the `pillpal/` directory and that `pillpal/vite.config.js` contains the alias mapping.
-
-### Supabase requests fail / return permission errors
-If you enabled RLS (Row Level Security) in Supabase, you must add appropriate policies. For a small demo project, you can also disable RLS on the tables to simplify setup.
+- This is a single-page app (SPA) using client-side routing.
+- `pillpal/vercel.json` rewrites all routes to `index.html` so direct navigation works on Vercel.
 
 ## License
 
-For educational use.
+Educational use.
