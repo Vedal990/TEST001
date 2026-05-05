@@ -8,27 +8,42 @@ export function SettingsProvider({ children }) {
   const { userId } = useAuth();
   const [fontScale, setFontScale] = useState(FONT_SCALE_NORMAL);
 
+  /**
+   * Applies the calculated font size to the root document element
+   */
   const applyScale = (scale) => {
-    document.documentElement.style.setProperty("--app-font-size", fontScaleToPx(scale));
+    const pxValue = fontScaleToPx(scale);
+    document.documentElement.style.setProperty("--app-font-size", pxValue);
   };
 
   useEffect(() => {
-    if (!userId) return;
-    let mounted = true;
-    async function load() {
-      try {
-        const s = await getUserSettings(userId);
-        if (mounted && s?.font_scale) {
-          setFontScale(s.font_scale);
-          applyScale(s.font_scale);
+    // Re-calculate font size on window resize (especially for mobile/desktop switching)
+    const handleResize = () => {
+      applyScale(fontScale);
+    };
+
+    window.addEventListener('resize', handleResize);
+    
+    // Initial load from database
+    if (userId) {
+      let mounted = true;
+      async function load() {
+        try {
+          const s = await getUserSettings(userId);
+          if (mounted && s?.font_scale) {
+            setFontScale(s.font_scale);
+            applyScale(s.font_scale);
+          }
+        } catch (e) {
+          console.error("Failed to load settings in context", e);
         }
-      } catch (e) {
-        console.error("Failed to load settings in context", e);
       }
+      load();
+      return () => { mounted = false; };
     }
-    load();
-    return () => { mounted = false; };
-  }, [userId]);
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, [userId, fontScale]);
 
   const updateFontScale = (newScale) => {
     setFontScale(newScale);
